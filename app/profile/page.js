@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -14,7 +14,7 @@ const FollowListModal = dynamic(() => import("../components/FollowListModal"), {
   ssr: false,
 });
 
-export default function UserProfile() {
+function UserProfile() {
   const [userData, setUserData] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -470,5 +470,17 @@ export default function UserProfile() {
         emptyMessage="Not following anyone yet"
       />
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p className="text-xl text-zinc-400">Loading profile...</p>
+      </div>
+    }>
+      <UserProfile />
+    </Suspense>
   );
 }
