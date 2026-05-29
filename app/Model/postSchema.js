@@ -1,4 +1,3 @@
-// app/Model/postSchema.js
 
 import mongoose from "mongoose"
 
@@ -19,12 +18,32 @@ const postSchema = new mongoose.Schema({
         {
             type: String
         }
-    ]
+    ],
+    like:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"users"
+    }],
+    comment:[{
+            type:mongoose.Schema.Types.ObjectId,
+        ref:"comment"
+    }],
+    views: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users"
+    }],
+    shares: {
+        type: Number,
+        default: 0
+    }
+    
 
 }, {
     timestamps: true
 })
 
-export const PostModel =
-    mongoose.models.posts ||
-    mongoose.model("posts", postSchema)
+// Force Mongoose to compile the updated schema with the new views and shares fields
+if (mongoose.models.posts) {
+    delete mongoose.models.posts;
+}
+
+export const PostModel = mongoose.model("posts", postSchema);

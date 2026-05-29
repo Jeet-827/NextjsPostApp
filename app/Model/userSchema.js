@@ -27,7 +27,18 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "posts"
         }
-    ]
+    ],
+    bio:{
+        type:String,
+    },
+    follower:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"users"
+    }],
+    following:[{
+          type:mongoose.Schema.Types.ObjectId,
+        ref:"users"
+    }]
 
 }, {
     timestamps: true

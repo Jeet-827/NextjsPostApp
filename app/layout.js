@@ -1,7 +1,7 @@
 import "./globals.css";
 import { SesstionCover } from "./components/Session";
-
-
+import Provider from "./store/providers/ReduxProvider";
+import Sidebar from "./components/Navbar";
 
 export const metadata = {
   title: "Create Next App",
@@ -11,10 +11,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning className="min-h-full flex flex-col">
+      <body suppressHydrationWarning className="min-h-screen flex bg-black text-white antialiased">
+        <Provider>
+        <Sidebar/>
         <SesstionCover>
-          {children}
+          <main className="flex-1 flex flex-col min-h-screen overflow-y-auto">
+            {children}
+          </main>
         </SesstionCover>
+        </Provider>
       </body>
     </html>
   );

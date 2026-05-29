@@ -1,42 +1,44 @@
-// app/api/post/route.js
-
-import { NextResponse } from "next/server"
 import ImageKit from "imagekit"
-import jwt from "jsonwebtoken"
+import { getAuthUser } from "@/app/lib/auth"
+import { rateLimit } from "@/app/lib/rateLimit"
+
+import { userModel } from "@/app/Model/userSchema"
+import { PostModel } from "@/app/Model/postSchema"
 
 import { Connect } from "@/app/lib/Mongodb-config"
-import { PostModel } from "@/app/Model/postSchema"
-import { userModel } from "@/app/Model/userSchema"
 
-const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET
+import { NextResponse } from "next/server"
 
 const imagekit = new ImageKit({
     publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
     privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
-    urlEndpoint: process.env.URL_ENDPOINT || process.env.IMAGEKIT_URL_ENDPOINT
+    urlEndpoint: process.env.URL_ENDPOINT
 })
 
 export async function POST(req) {
+
     try {
-        await Connect()
-
-        const token = req.headers
-            .get("authorization")
-            ?.split(" ")[1]
-
-        if (!token) {
+        const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+        const limitRes = rateLimit(ip, 60, 60 * 1000); // 60 requests per minute
+        if (!limitRes.success) {
             return NextResponse.json(
-                { message: "Token Missing" },
-                { status: 401 }
-            )
+                { error: "Too many post creation requests. Please try again in 1 minute." },
+                { 
+                    status: 429,
+                    headers: {
+                        "Retry-After": Math.ceil((limitRes.reset - Date.now()) / 1000).toString()
+                    }
+                }
+            );
         }
 
-        let decode
-        try {
-            decode = jwt.verify(token, ACCESS_SECRET)
-        } catch (err) {
+        await Connect()
+
+        const decode = getAuthUser(req)
+
+        if (!decode) {
             return NextResponse.json(
-                { message: "Invalid or expired token" },
+                { message: "Token Missing or Expired" },
                 { status: 401 }
             )
         }
@@ -51,42 +53,45 @@ export async function POST(req) {
         }
 
         const formData = await req.formData()
+
         const title = formData.get("title")
 
         const images = formData.getAll("images")
 
         if (!title || images.length === 0) {
-            console.log("Post create rejected (400):", { title, imagesLength: images?.length })
             return NextResponse.json(
-                { message: "All fields required" },
+                { message: "Title or Images Missing" },
                 { status: 400 }
             )
         }
 
-        const uploadedImages = []
+        const uploadUrls = []
 
-        for (const image of images) {
+        for (let i = 0; i < images.length; i++) {
+
+            const image = images[i]
+
             const bytes = await image.arrayBuffer()
+
             const buffer = Buffer.from(bytes)
 
             const response = await imagekit.upload({
                 file: buffer,
                 fileName: image.name,
+                folder:"/post"
             })
 
-            uploadedImages.push(response.url)
+            uploadUrls.push(response.url)
         }
 
         const post = await PostModel.create({
             userId: user._id,
             title,
-            images: uploadedImages
+            images: uploadUrls
         })
 
-        if (!user.posts) {
-            user.posts = []
-        }
         user.posts.push(post._id)
+
         await user.save()
 
         return NextResponse.json(
@@ -98,9 +103,38 @@ export async function POST(req) {
         )
 
     } catch (error) {
-        console.error("Post Creation API Error:", error)
+
+        console.log(error)
+
         return NextResponse.json(
-            { message: "Server Error" },
+            {
+                message: "Server Error"
+            },
+            { status: 500 }
+        )
+    }
+}
+
+export async function GET(req) {
+    try {
+        await Connect()
+
+        const posts = await PostModel.find()
+            .populate("userId", "username email image")
+            .sort({ createdAt: -1 })
+
+        return NextResponse.json(
+            {
+                posts
+            },
+            { status: 200 }
+        )
+    } catch (error) {
+        console.error("Fetch posts failed:", error);
+        return NextResponse.json(
+            {
+                message: "Server Error"
+            },
             { status: 500 }
         )
     }
