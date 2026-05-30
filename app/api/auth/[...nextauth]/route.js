@@ -14,14 +14,12 @@ const handle = NextAuth({
         async signIn({ user }) {
             try {
                 await Connect()
-                const findUser = await userModel.findOne({ email: user.email })
+                const findUser = await userModel.findOne({ email: user.email?.toLowerCase() })
                 if (!findUser) {
+                    const username = user.name?.replace(/\s/g, "").toLowerCase() || user.email?.split("@")[0] || "user";
                     await userModel.create({
-
-                        username: user.name,
-
-                        email: user.email,
-
+                        username,
+                        email: user.email?.toLowerCase(),
                         image: user.image
                     })
                     console.log("User Created")
