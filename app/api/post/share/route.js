@@ -1,5 +1,4 @@
 import { PostModel } from "@/app/Model/postSchema";
-import { NotificationModel } from "@/app/Model/notificationSchema";
 import { getAuthUser } from "@/app/lib/auth";
 import { rateLimit } from "@/app/lib/rateLimit";
 import { Connect } from "@/app/lib/Mongodb-config";
@@ -10,7 +9,7 @@ export const POST = async (req) => {
         await Connect();
 
         const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
-        const limitRes = rateLimit(ip, 60, 60 * 1000); // 60 requests per minute
+        const limitRes = rateLimit(ip, 60, 60 * 1000); 
         if (!limitRes.success) {
             return NextResponse.json(
                 { error: "Too many requests. Please try again in 1 minute." },
@@ -40,15 +39,6 @@ export const POST = async (req) => {
 
         post.shares = (post.shares || 0) + 1;
         await post.save();
-
-        if (post.userId.toString() !== decode.id.toString()) {
-            await NotificationModel.create({
-                sender: decode.id,
-                receiver: post.userId,
-                type: "share",
-                postId: post._id
-            });
-        }
 
         return NextResponse.json({ message: 'Success', sharesCount: post.shares }, { status: 200 });
     } catch (error) {

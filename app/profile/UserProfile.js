@@ -229,6 +229,7 @@ export default function UserProfile() {
 
   return (
     <div className="min-h-screen bg-black text-white px-4 py-8">
+      <title>{`${userData.username} (@${userData.username}) | NextPost`}</title>
       <div className="max-w-6xl mx-auto">
         {/* Profile Card */}
         <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
