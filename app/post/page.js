@@ -217,7 +217,7 @@ const Page = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => removeImage(index)}
-                                                    className="w-full bg-white hover:bg-zinc-300 text-black py-2 rounded-xl transition font-semibold"
+                                                    className="w-full bg-white hover:bg-zinc-300 text-black py-2 rounded-xl transition font-semibold cursor-pointer"
                                                 >
                                                     Remove
                                                 </button>
@@ -242,7 +242,7 @@ const Page = () => {
                         
                         ${loading
                             ? "bg-zinc-700 cursor-not-allowed text-zinc-400"
-                            : "bg-white hover:bg-zinc-300 text-black"
+                            : "bg-white hover:bg-zinc-300 text-black cursor-pointer"
                         }
                     `}
                 >

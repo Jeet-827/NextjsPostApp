@@ -156,7 +156,7 @@ return (
         />
 
         <button
-          className="w-full bg-blue-600 hover:bg-blue-700 transition-all text-white py-3 rounded-xl font-semibold"
+          className="w-full bg-blue-600 hover:bg-blue-700 transition-all text-white py-3 rounded-xl font-semibold cursor-pointer"
         >
           {isLogin ? "Login" : "Signup"}
         </button>
@@ -169,7 +169,7 @@ return (
 
       <button
         onClick={() => signIn("google")}
-        className="w-full bg-white hover:bg-gray-200 transition-all text-black py-3 rounded-xl font-semibold"
+        className="w-full bg-white hover:bg-gray-200 transition-all text-black py-3 rounded-xl font-semibold cursor-pointer"
       >
         Continue with Google
       </button>
