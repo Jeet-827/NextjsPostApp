@@ -98,14 +98,12 @@ export async function POST(request) {
     const response = NextResponse.json(
       {
         message: "Signup successful",
-
         user: {
           id: newUser._id,
           username: newUser.username,
           email: newUser.email,
           image: newUser.image,
-        },
-        accessToken
+        }
       },
       {
         status: 200,

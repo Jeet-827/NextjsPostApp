@@ -77,7 +77,6 @@ export async function POST(req) {
         const response = NextResponse.json(
             {
                 message: "Google Login Success",
-                accessToken,
                 user
             },
             {

@@ -49,7 +49,6 @@ export const GET = async (req) => {
     const response = NextResponse.json(
       {
         message: "Access token generated",
-        accessToken, 
       },
       {
         status: 200,
