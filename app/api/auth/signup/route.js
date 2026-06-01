@@ -4,6 +4,7 @@ import { userModel } from "@/app/Model/userSchema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { rateLimit } from "@/app/lib/rateLimit";
+import { cookies } from "next/headers";
 
 export async function POST(request) {
   try {
@@ -111,9 +112,9 @@ export async function POST(request) {
       }
     );
 
-    
+    const cookieStore = await cookies();
 
-    response.cookies.set(
+    cookieStore.set(
       "refreshToken",
       refreshToken,
       {
@@ -126,7 +127,7 @@ export async function POST(request) {
       }
     );
 
-    response.cookies.set(
+    cookieStore.set(
       "accessToken",
       accessToken,
       {
@@ -135,7 +136,6 @@ export async function POST(request) {
           process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: 15 * 60,
       }
     );
 

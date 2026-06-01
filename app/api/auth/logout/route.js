@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export async function POST() {
   const response = NextResponse.json(
@@ -6,22 +7,9 @@ export async function POST() {
     { status: 200 }
   );
 
-  // Delete cookies by setting expiration in the past
-  response.cookies.set("accessToken", "", {
-    path: "/",
-    expires: new Date(0),
-    maxAge: 0,
-  });
-
-  response.cookies.set("refreshToken", "", {
-    path: "/",
-    expires: new Date(0),
-    maxAge: 0,
-  });
-
-  // Explicitly delete as well
-  response.cookies.delete("accessToken");
-  response.cookies.delete("refreshToken");
+  const cookieStore = await cookies();
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
 
   return response;
 }

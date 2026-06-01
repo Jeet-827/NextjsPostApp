@@ -4,6 +4,7 @@ import { userModel } from '@/app/Model/userSchema';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { rateLimit } from '@/app/lib/rateLimit';
+import { cookies } from 'next/headers';
 
 const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'fallback_access_secret_12345';
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'fallback_refresh_secret_12345';
@@ -85,8 +86,9 @@ export async function POST(request) {
             { status: 200 }
         );
 
+        const cookieStore = await cookies();
      
-        response.cookies.set('refreshToken', refreshToken, {
+        cookieStore.set('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
@@ -94,12 +96,11 @@ export async function POST(request) {
             maxAge: 7 * 24 * 60 * 60 
         });
 
-        response.cookies.set('accessToken', accessToken, {
+        cookieStore.set('accessToken', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            path: '/',
-            maxAge: 15 * 60
+            path: '/'
         });
 
         return response;

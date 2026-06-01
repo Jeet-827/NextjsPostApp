@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export const GET = async (req) => {
   try {
@@ -55,7 +56,9 @@ export const GET = async (req) => {
       }
     );
 
-    response.cookies.set(
+    const cookieStore = await cookies();
+
+    cookieStore.set(
       "refreshToken",
       refreshToken,
       {
@@ -68,7 +71,7 @@ export const GET = async (req) => {
       }
     );
 
-    response.cookies.set(
+    cookieStore.set(
       "accessToken",
       accessToken,
       {
@@ -77,7 +80,6 @@ export const GET = async (req) => {
           process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: 15 * 60,
       }
     );
 
