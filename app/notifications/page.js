@@ -179,7 +179,7 @@ const NotificationsPage = () => {
       <div className="w-full max-w-2xl border-x border-zinc-800 flex flex-col min-h-screen">
         
         {/* Sticky Header */}
-        <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-xl border-b border-zinc-800 p-4 flex items-center justify-between">
+        <div className="sticky top-14 md:top-0 z-10 bg-black/80 backdrop-blur-xl border-b border-zinc-800 p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold">Notifications</h1>
             {unreadCount > 0 && (

@@ -77,7 +77,13 @@ export async function POST(req) {
         const response = NextResponse.json(
             {
                 message: "Google Login Success",
-                user
+                user: {
+                    id: user._id,
+                    username: user.username,
+                    email: user.email,
+                    image: user.image,
+                    bio: user.bio,
+                }
             },
             {
                 status: 200
@@ -89,6 +95,7 @@ export async function POST(req) {
         cookieStore.set("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
             path: "/",
             maxAge: 7 * 24 * 60 * 60
         })
@@ -97,7 +104,8 @@ export async function POST(req) {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
-            path: "/"
+            path: "/",
+            maxAge: 15 * 60 // 15 minutes - matches JWT expiry
         })
 
         return response

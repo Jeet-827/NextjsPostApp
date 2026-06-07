@@ -65,6 +65,38 @@ export async function POST(req) {
             )
         }
 
+        if (title.length > 500) {
+            return NextResponse.json(
+                { message: "Title must be 500 characters or less" },
+                { status: 400 }
+            )
+        }
+
+        if (images.length > 10) {
+            return NextResponse.json(
+                { message: "Maximum 10 images allowed per post" },
+                { status: 400 }
+            )
+        }
+
+        // Validate each file is an image and under 10MB
+        const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"];
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        for (const image of images) {
+            if (!ALLOWED_TYPES.includes(image.type)) {
+                return NextResponse.json(
+                    { message: `Invalid file type: ${image.name}. Only JPEG, PNG, GIF, WebP and AVIF images are allowed.` },
+                    { status: 400 }
+                );
+            }
+            if (image.size > MAX_FILE_SIZE) {
+                return NextResponse.json(
+                    { message: `File too large: ${image.name}. Maximum file size is 10MB.` },
+                    { status: 400 }
+                );
+            }
+        }
+
         const uploadUrls = []
 
         for (let i = 0; i < images.length; i++) {

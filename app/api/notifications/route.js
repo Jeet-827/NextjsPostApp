@@ -29,6 +29,18 @@ export const GET = async (req) => {
             return NextResponse.json({ message: 'Token not found or expired' }, { status: 401 });
         }
 
+        const url = new URL(req.url);
+        const unreadOnly = url.searchParams.get("unreadOnly") === "true";
+
+        if (unreadOnly) {
+            // Lightweight count-only query used by the Navbar badge poll
+            const unreadCount = await NotificationModel.countDocuments({
+                receiver: decode.id,
+                isRead: false,
+            });
+            return NextResponse.json({ unreadCount }, { status: 200 });
+        }
+
         // Fetch user's notifications, fully populated
         const notifications = await NotificationModel.find({ receiver: decode.id })
             .populate("sender", "username image bio")

@@ -5,7 +5,7 @@ import { userModel } from "@/app/Model/userSchema";
 
 export async function GET(req) {
   try {
-    const decoded = getAuthUser(req);
+    const decoded = await getAuthUser(req);
     if (!decoded || !decoded.id) {
       return NextResponse.json(
         { error: "Not authenticated" },

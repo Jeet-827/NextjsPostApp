@@ -1,17 +1,20 @@
 import { getAuthUser } from "@/app/lib/auth";
 import { userModel } from "@/app/Model/userSchema";
+import { Connect } from "@/app/lib/Mongodb-config";
 import { NextResponse } from "next/server";
 import ImageKit from "imagekit";
 
+const imagekit = new ImageKit({
+  publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+  urlEndpoint: process.env.URL_ENDPOINT,
+});
+
 export const POST = async (req) => {
   try {
-    const imagekit = new ImageKit({
-      publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
-      privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
-      urlEndpoint: process.env.URL_ENDPOINT,
-    });
+    await Connect();
 
-    const decode = getAuthUser(req);
+    const decode = await getAuthUser(req);
 
     if (!decode) {
       return NextResponse.json(

@@ -21,7 +21,7 @@ export const POST = async (req) => {
             );
         }
 
-        const decode = getAuthUser(req);
+        const decode = await getAuthUser(req);
         if (!decode) {
             return NextResponse.json({ message: 'Token not found or expired' }, { status: 401 });
         }

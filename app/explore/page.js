@@ -123,7 +123,7 @@ const ExplorePage = () => {
     <main className="min-h-screen bg-black text-white flex justify-center">
       <div className="w-full max-w-2xl border-x border-zinc-800">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-xl border-b border-zinc-800 p-4">
+        <div className="sticky top-14 md:top-0 z-10 bg-black/80 backdrop-blur-xl border-b border-zinc-800 p-4">
           <h1 className="text-2xl font-bold mb-4">Explore</h1>
 
           {/* Search Bar */}

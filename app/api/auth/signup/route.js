@@ -106,7 +106,7 @@ export async function POST(request) {
         }
       },
       {
-        status: 200,
+        status: 201,
       }
     );
 
@@ -134,6 +134,7 @@ export async function POST(request) {
           process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
+        maxAge: 15 * 60, // 15 minutes - matches JWT expiry
       }
     );
 

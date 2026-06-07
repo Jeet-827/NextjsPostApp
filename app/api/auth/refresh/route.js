@@ -4,9 +4,13 @@ import { cookies } from "next/headers";
 
 export const GET = async (req) => {
   try {
+    const hasNextAuth = req.cookies?.get?.("next-auth.session-token")?.value || req.cookies?.get?.("__Secure-next-auth.session-token")?.value;
+    if (hasNextAuth) {
+      return NextResponse.json({ message: "NextAuth session active" }, { status: 200 });
+    }
 
     const getToken =
-      req.cookies.get("refreshToken")?.value;
+      req.cookies?.get?.("refreshToken")?.value;
 
     if (!getToken) {
       return NextResponse.json(
@@ -79,6 +83,7 @@ export const GET = async (req) => {
           process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
+        maxAge: 15 * 60, // 15 minutes - matches JWT expiry
       }
     );
 

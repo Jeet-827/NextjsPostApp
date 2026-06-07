@@ -66,4 +66,4 @@ const ReduxProvider = ({ children }) => {
   );
 };
 
-export default ReduxProvider;
+export default ReduxProvider;

@@ -22,7 +22,7 @@ export const GET = async (req) => {
 
     await Connect();
 
-    const decode = getAuthUser(req);
+    const decode = await getAuthUser(req);
     if (!decode) {
       return NextResponse.json(
         { message: "Token not found or expired" },
@@ -40,11 +40,14 @@ export const GET = async (req) => {
       );
     }
 
+    // Escape special regex characters to prevent ReDoS attacks
+    const safeQuery = query.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     // Case-insensitive regex search on username
     const users = await userModel
       .find({
         _id: { $ne: decode.id },
-        username: { $regex: query.trim(), $options: "i" },
+        username: { $regex: safeQuery, $options: "i" },
       })
       .select("_id username email image bio follower")
       .limit(20);

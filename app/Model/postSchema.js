@@ -41,9 +41,6 @@ const postSchema = new mongoose.Schema({
     timestamps: true
 })
 
-// Force Mongoose to compile the updated schema with the new views and shares fields
-if (mongoose.models.posts) {
-    delete mongoose.models.posts;
-}
-
-export const PostModel = mongoose.model("posts", postSchema);
+export const PostModel =
+    mongoose.models.posts ||
+    mongoose.model("posts", postSchema);

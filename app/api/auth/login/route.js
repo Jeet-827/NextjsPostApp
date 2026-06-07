@@ -99,7 +99,8 @@ export async function POST(request) {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            path: '/'
+            path: '/',
+            maxAge: 15 * 60 // 15 minutes - matches JWT expiry
         });
 
         return response;

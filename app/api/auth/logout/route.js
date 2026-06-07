@@ -10,6 +10,10 @@ export async function POST() {
   const cookieStore = await cookies();
   cookieStore.delete("accessToken");
   cookieStore.delete("refreshToken");
+  cookieStore.delete("next-auth.session-token");
+  cookieStore.delete("__Secure-next-auth.session-token");
+  cookieStore.delete("next-auth.callback-url");
+  cookieStore.delete("next-auth.csrf-token");
 
   return response;
 }

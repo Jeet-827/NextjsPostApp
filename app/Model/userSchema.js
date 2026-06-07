@@ -6,12 +6,16 @@ const userSchema = new mongoose.Schema({
 
     username: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
     },
 
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
     },
 
     password: {
@@ -30,6 +34,7 @@ const userSchema = new mongoose.Schema({
     ],
     bio:{
         type:String,
+        maxlength: 500,
     },
     follower:[{
         type:mongoose.Schema.Types.ObjectId,
@@ -46,4 +51,4 @@ const userSchema = new mongoose.Schema({
 
 export const userModel =
     mongoose.models.users ||
-    mongoose.model("users", userSchema)
+    mongoose.model("users", userSchema)
