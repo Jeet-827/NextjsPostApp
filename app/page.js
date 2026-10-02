@@ -1,14 +1,9 @@
-import React from 'react'
-import Register from './register/page'
+import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Join NextPost",
+  title: "NextPost - Share Your Moments",
 };
 
-const page = () => {
-  return (
-    <div><Register /></div>
-  )
+export default function RootPage() {
+  redirect("/home");
 }
-
-export default page

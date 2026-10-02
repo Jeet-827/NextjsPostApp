@@ -59,14 +59,6 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/register");
-    }
-  }, [user, authLoading, router]);
-
-  useEffect(() => {
-    if (!user) return;
-
     const fetchPosts = async () => {
       if (page <= lastFetchedPage.current) return;
 
@@ -76,7 +68,7 @@ const Page = () => {
         }
 
         const res = await axios.get(`/api/getpost?page=${page}&limit=10`);
-        if (res.data.posts.length === 0) {
+        if (!res.data.posts || res.data.posts.length === 0) {
           setHashMore(false);
         }
         setPosts((prev) => {
@@ -104,17 +96,20 @@ const Page = () => {
         lastFetchedPage.current = page;
         
       } catch (err) {
-        console.error(err);
+        console.error("Fetch posts error:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPosts();
-  }, [user, page]);
+  }, [page]);
 
   const handleLike = useCallback(async (postId) => {
-    if (!currentUserId) return;
+    if (!currentUserId) {
+      router.push("/register");
+      return;
+    }
     try {
       const res = await axios.post('/api/auth/like', { postId });
       if (res.status === 200) {
@@ -132,7 +127,7 @@ const Page = () => {
     } catch (error) {
       console.error("Like error", error);
     }
-  }, [currentUserId]);
+  }, [currentUserId, router]);
 
   const handleShare = useCallback(async (postId) => {
     try {
@@ -160,7 +155,11 @@ const Page = () => {
 
   const handlePostComment = useCallback(async (e) => {
     e.preventDefault();
-    if (!currentUserId || !commentInput.trim() || !activePostForComments) return;
+    if (!currentUserId) {
+      router.push("/register");
+      return;
+    }
+    if (!commentInput.trim() || !activePostForComments) return;
 
     try {
       setSubmittingComment(true);
@@ -203,7 +202,7 @@ const Page = () => {
     } finally {
       setSubmittingComment(false);
     }
-  }, [currentUserId, commentInput, activePostForComments]);
+  }, [currentUserId, commentInput, activePostForComments, router]);
 
 
   useEffect(()=>{
@@ -226,6 +225,21 @@ const Page = () => {
   return (
     <main className="min-h-screen bg-black text-white flex justify-center">
       <div className="w-full max-w-2xl border-x border-zinc-800">
+
+        {!authLoading && !user && (
+          <div className="p-4 mx-4 my-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+            <div>
+              <p className="font-semibold text-white text-sm">Welcome to NextPost!</p>
+              <p className="text-xs text-zinc-400">Log in or sign up to like, comment, and share your own posts.</p>
+            </div>
+            <button
+              onClick={() => router.push("/register")}
+              className="px-4 py-2 bg-white text-black font-semibold text-xs rounded-xl hover:bg-zinc-200 transition cursor-pointer self-start sm:self-auto shrink-0"
+            >
+              Log in / Sign up
+            </button>
+          </div>
+        )}
 
         {loading && (
           <p className="text-center py-10 text-zinc-400">
@@ -262,6 +276,7 @@ const Page = () => {
         setCommentInput={setCommentInput}
         handlePostComment={handlePostComment}
         submittingComment={submittingComment}
+        currentUserId={currentUserId}
       />
     </main>
   );

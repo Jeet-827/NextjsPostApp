@@ -10,21 +10,9 @@ export const GET = async (req) => {
     await Connect();
 
     const decode = getAuthUser(req);
-
-    if (!decode) {
-      return NextResponse.json(
-        { message: "Token Missing or Expired" },
-        { status: 401 }
-      );
-    }
-
-    const user = await userModel.findById(decode.id);
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "User Not Found" },
-        { status: 404 }
-      );
+    let user = null;
+    if (decode?.id) {
+      user = await userModel.findById(decode.id);
     }
 
     const url = new URL(req.url);
@@ -37,8 +25,8 @@ export const GET = async (req) => {
       .sort({ createdAt: -1 })
       .limit(300);
 
-    const followingIds = new Set((user.following || []).map(id => id.toString()));
-    const userIdStr = decode.id.toString();
+    const followingIds = user ? new Set((user.following || []).map(id => id.toString())) : new Set();
+    const userIdStr = decode?.id ? decode.id.toString() : "";
 
     // Score posts based on recommendation parameters
     const scoredPosts = recentPosts.map(post => {
@@ -81,22 +69,24 @@ export const GET = async (req) => {
       return p ? p.toObject() : null;
     }).filter(Boolean);
 
-    // Asynchronously register views for returned posts
-    const postsToUpdateViews = orderedPosts.filter(p => !p.views || !p.views.some(v => v.toString() === userIdStr));
-    if (postsToUpdateViews.length > 0) {
-      const postIdsToUpdate = postsToUpdateViews.map(p => p._id);
-      await PostModel.updateMany(
-        { _id: { $in: postIdsToUpdate } },
-        { $addToSet: { views: decode.id } }
-      );
-      
-      // Update local views count for immediate UI display
-      orderedPosts.forEach(p => {
-        if (postIdsToUpdate.some(id => id.toString() === p._id.toString())) {
-          if (!p.views) p.views = [];
-          p.views.push(decode.id);
-        }
-      });
+    // Asynchronously register views for returned posts if authenticated
+    if (decode?.id) {
+      const postsToUpdateViews = orderedPosts.filter(p => !p.views || !p.views.some(v => v.toString() === userIdStr));
+      if (postsToUpdateViews.length > 0) {
+        const postIdsToUpdate = postsToUpdateViews.map(p => p._id);
+        await PostModel.updateMany(
+          { _id: { $in: postIdsToUpdate } },
+          { $addToSet: { views: decode.id } }
+        );
+        
+        // Update local views count for immediate UI display
+        orderedPosts.forEach(p => {
+          if (postIdsToUpdate.some(id => id.toString() === p._id.toString())) {
+            if (!p.views) p.views = [];
+            p.views.push(decode.id);
+          }
+        });
+      }
     }
 
     return NextResponse.json(

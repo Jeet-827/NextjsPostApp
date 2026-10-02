@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Home, Search, Users, Bell, User, LogOut, Plus } from "lucide-react";
+import { Home, Search, Users, Bell, User, LogOut, Plus, LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -126,20 +126,30 @@ const Sidebar = () => {
         {/* Bottom section */}
         <div>
           <Link
-            href="/post"
+            href={user ? "/post" : "/register"}
             className="w-full bg-white text-black py-4 rounded-2xl flex items-center justify-center gap-3 text-lg font-semibold hover:bg-zinc-200 transition"
           >
             <Plus size={24} />
             <span>Create Post</span>
           </Link>
 
-          <button
-            onClick={handleLogout}
-            className="mt-8 w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-zinc-500 hover:bg-zinc-900 hover:text-white transition cursor-pointer"
-          >
-            <LogOut size={24} />
-            <span className="text-lg font-semibold">Logout</span>
-          </button>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="mt-8 w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-zinc-500 hover:bg-zinc-900 hover:text-white transition cursor-pointer"
+            >
+              <LogOut size={24} />
+              <span className="text-lg font-semibold">Logout</span>
+            </button>
+          ) : (
+            <Link
+              href="/register"
+              className="mt-8 w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-zinc-300 hover:bg-zinc-900 hover:text-white transition cursor-pointer"
+            >
+              <LogIn size={24} />
+              <span className="text-lg font-semibold">Log In / Sign Up</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -148,17 +158,26 @@ const Sidebar = () => {
       {/* ======================================================== */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-black/95 backdrop-blur-md border-b border-zinc-800/80 h-14 flex items-center justify-between px-4">
         {/* User Profile Avatar (Opens Drawer) */}
-        <button
-          onClick={() => setDrawerOpen(true)}
-          className="w-8 h-8 rounded-full overflow-hidden border border-zinc-700 bg-zinc-800 shrink-0 focus:outline-none cursor-pointer"
-          aria-label="Open navigation drawer"
-        >
-          <img
-            src={user?.image || "https://i.pravatar.cc/150"}
-            alt="Profile Avatar"
-            className="w-full h-full object-cover"
-          />
-        </button>
+        {user ? (
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="w-8 h-8 rounded-full overflow-hidden border border-zinc-700 bg-zinc-800 shrink-0 focus:outline-none cursor-pointer"
+            aria-label="Open navigation drawer"
+          >
+            <img
+              src={user?.image || "https://i.pravatar.cc/150"}
+              alt="Profile Avatar"
+              className="w-full h-full object-cover"
+            />
+          </button>
+        ) : (
+          <Link
+            href="/register"
+            className="text-xs font-semibold bg-white text-black px-3 py-1.5 rounded-full hover:bg-zinc-200 transition"
+          >
+            Log In
+          </Link>
+        )}
 
         {/* App Logo */}
         <Link href="/home" className="flex items-center">
@@ -169,14 +188,24 @@ const Sidebar = () => {
           </svg>
         </Link>
 
-        {/* Quick Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="text-zinc-400 hover:text-white p-1 cursor-pointer"
-          aria-label="Logout"
-        >
-          <LogOut size={20} />
-        </button>
+        {/* Quick Logout Button or Log In Link */}
+        {user ? (
+          <button
+            onClick={handleLogout}
+            className="text-zinc-400 hover:text-white p-1 cursor-pointer"
+            aria-label="Logout"
+          >
+            <LogOut size={20} />
+          </button>
+        ) : (
+          <Link
+            href="/register"
+            className="text-zinc-400 hover:text-white p-1 cursor-pointer"
+            aria-label="Log in"
+          >
+            <LogIn size={20} />
+          </Link>
+        )}
       </div>
 
       {/* ======================================================== */}
@@ -216,8 +245,8 @@ const Sidebar = () => {
                 </button>
               </div>
 
-              {/* User Bio Card */}
-              {user && (
+              {/* User Bio Card or Guest Greeting */}
+              {user ? (
                 <div className="mb-8 p-4 rounded-2xl bg-zinc-950 border border-zinc-900 shadow-inner">
                   <Link href="/profile" onClick={() => setDrawerOpen(false)} className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 rounded-full overflow-hidden border border-zinc-800 shrink-0">
@@ -235,6 +264,18 @@ const Sidebar = () => {
                   {user.bio && (
                     <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3">{user.bio}</p>
                   )}
+                </div>
+              ) : (
+                <div className="mb-8 p-4 rounded-2xl bg-zinc-950 border border-zinc-900 text-center">
+                  <p className="text-sm font-semibold text-white mb-1">Welcome to NextPost</p>
+                  <p className="text-xs text-zinc-400 mb-3">Log in to create posts, like, and comment</p>
+                  <Link
+                    href="/register"
+                    onClick={() => setDrawerOpen(false)}
+                    className="inline-block w-full py-2.5 px-4 bg-white text-black font-semibold text-xs rounded-xl hover:bg-zinc-200 transition"
+                  >
+                    Log In / Sign Up
+                  </Link>
                 </div>
               )}
 
@@ -300,15 +341,26 @@ const Sidebar = () => {
               </div>
             </div>
 
-            {/* Bottom Logout */}
+            {/* Bottom Logout or Log In */}
             <div>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-zinc-500 hover:bg-zinc-900 hover:text-white transition cursor-pointer font-semibold"
-              >
-                <LogOut size={22} />
-                <span>Logout</span>
-              </button>
+              {user ? (
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-zinc-500 hover:bg-zinc-900 hover:text-white transition cursor-pointer font-semibold"
+                >
+                  <LogOut size={22} />
+                  <span>Logout</span>
+                </button>
+              ) : (
+                <Link
+                  href="/register"
+                  onClick={() => setDrawerOpen(false)}
+                  className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-zinc-300 hover:bg-zinc-900 hover:text-white transition cursor-pointer font-semibold"
+                >
+                  <LogIn size={22} />
+                  <span>Log In / Sign Up</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

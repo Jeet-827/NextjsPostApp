@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 
 const CommentsModal = ({
@@ -10,7 +11,9 @@ const CommentsModal = ({
   setCommentInput,
   handlePostComment,
   submittingComment,
+  currentUserId,
 }) => {
+  const router = useRouter();
   if (!activePostForComments) return null;
 
   return (
@@ -85,23 +88,38 @@ const CommentsModal = ({
           )}
         </div>
 
-        {/* Post Comment Form */}
-        <form onSubmit={handlePostComment} className="flex gap-3 pt-3 border-t border-zinc-800/80">
-          <input
-            type="text"
-            value={commentInput}
-            onChange={(e) => setCommentInput(e.target.value)}
-            placeholder="Post your reply..."
-            className="flex-1 bg-black border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white transition placeholder:text-zinc-500"
-          />
-          <button 
-            type="submit" 
-            disabled={submittingComment || !commentInput.trim()} 
-            className="px-5 py-3 bg-white text-black font-semibold text-sm rounded-xl hover:bg-zinc-200 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
-          >
-            {submittingComment ? "Replying..." : "Reply"}
-          </button>
-        </form>
+        {/* Post Comment Form or Login Prompt */}
+        {!currentUserId ? (
+          <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between gap-3 bg-zinc-900/60 p-3 rounded-2xl">
+            <p className="text-sm text-zinc-400">
+              Log in to join the conversation and reply
+            </p>
+            <button
+              type="button"
+              onClick={() => router.push("/register")}
+              className="px-4 py-2 bg-white text-black font-semibold text-sm rounded-xl hover:bg-zinc-200 transition cursor-pointer shrink-0"
+            >
+              Log in
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handlePostComment} className="flex gap-3 pt-3 border-t border-zinc-800/80">
+            <input
+              type="text"
+              value={commentInput}
+              onChange={(e) => setCommentInput(e.target.value)}
+              placeholder="Post your reply..."
+              className="flex-1 bg-black border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white transition placeholder:text-zinc-500"
+            />
+            <button 
+              type="submit" 
+              disabled={submittingComment || !commentInput.trim()} 
+              className="px-5 py-3 bg-white text-black font-semibold text-sm rounded-xl hover:bg-zinc-200 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
+            >
+              {submittingComment ? "Replying..." : "Reply"}
+            </button>
+          </form>
+        )}
 
       </div>
     </>

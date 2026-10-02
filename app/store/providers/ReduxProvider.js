@@ -30,7 +30,8 @@ const AppInitializer = ({ children }) => {
         if (
           error.response?.status === 401 &&
           !originalRequest._retry &&
-          !originalRequest.url?.includes("/api/auth/refresh")
+          !originalRequest.url?.includes("/api/auth/refresh") &&
+          !originalRequest.url?.includes("/api/auth/me")
         ) {
           originalRequest._retry = true;
           try {
@@ -41,7 +42,11 @@ const AppInitializer = ({ children }) => {
           } catch (refreshError) {
             console.error("Session expired, redirecting to login:", refreshError);
             dispatch(clearUser());
-            if (window.location.pathname !== "/" && window.location.pathname !== "/register") {
+            if (
+              window.location.pathname !== "/" &&
+              window.location.pathname !== "/register" &&
+              window.location.pathname !== "/home"
+            ) {
               window.location.href = "/register";
             }
           }

@@ -10,9 +10,9 @@ import { Connect } from "@/app/lib/Mongodb-config"
 import { NextResponse } from "next/server"
 
 const imagekit = new ImageKit({
-    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
-    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
-    urlEndpoint: process.env.URL_ENDPOINT
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "dummy_public_key",
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "dummy_private_key",
+    urlEndpoint: process.env.URL_ENDPOINT || "https://ik.imagekit.io/dummy"
 })
 
 export async function POST(req) {

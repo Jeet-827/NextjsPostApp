@@ -5,9 +5,9 @@ import { NextResponse } from "next/server";
 import ImageKit from "imagekit";
 
 const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
-  urlEndpoint: process.env.URL_ENDPOINT,
+  publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "dummy_public_key",
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "dummy_private_key",
+  urlEndpoint: process.env.URL_ENDPOINT || "https://ik.imagekit.io/dummy",
 });
 
 export const POST = async (req) => {
